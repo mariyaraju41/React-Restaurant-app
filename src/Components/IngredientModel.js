@@ -1,38 +1,37 @@
-import React from "react";
+import React from 'react';
 
-function IngredientModal({ dish, onClose, onToggle, isSelected }) {
+export default function IngredientModal({ dish, onClose }) {
   if (!dish) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white rounded-lg p-4 w-80 relative">
-        <h2 className="text-lg font-semibold mb-2">{dish.name}</h2>
-        <p className="text-sm text-gray-600 mb-2">{dish.description}</p>
-        <h4 className="font-medium mb-2">Ingredients</h4>
-        <ul className="mb-4 list-disc list-inside text-sm">
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999
+    }}>
+      <div style={{
+        width: '95%', maxWidth: 500, background: '#fff',
+        borderRadius: 16, padding: 20, boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 style={{ margin: 0 }}>{dish.name}</h2>
+          <button onClick={onClose} style={{ background: 'transparent', border: 'none', fontSize: 18, cursor: 'pointer' }}>✕</button>
+        </div>
+        <p style={{ color: '#6b7280' }}>{dish.description}</p>
+        
+        <h3 style={{ marginTop: 16 }}>Ingredients</h3>
+        <ul style={{ listStyle: 'none', padding: 0 }}>
           {dish.ingredients.map((ing, idx) => (
-            <li key={idx}>
-              {ing.name} - {ing.quantity}
+            <li key={idx} style={{
+              display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0',
+              borderBottom: '1px solid #eee'
+            }}>
+              {/* Ingredient icon placeholder (replace with actual icons/images) */}
+              <img src={`https://source.unsplash.com/40x40/?${ing.name}`} alt={ing.name} style={{ borderRadius: '50%' }} />
+              <span><strong>{ing.name}</strong> — {ing.qty}</span>
             </li>
           ))}
         </ul>
-        <button
-          onClick={() => onToggle(dish.id)}
-          className={`w-full px-4 py-2 rounded-lg ${
-            isSelected ? "bg-red-500 text-white" : "bg-green-500 text-white"
-          }`}
-        >
-          {isSelected ? "Remove" : "Add +"}
-        </button>
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500"
-        >
-          ✕
-        </button>
       </div>
     </div>
   );
 }
-
-export default IngredientModal;

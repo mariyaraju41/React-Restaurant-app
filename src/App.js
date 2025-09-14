@@ -1,62 +1,84 @@
-import React, { useState } from "react";
-import { dishes } from "./data/mockDishes";
-import Filters from "./Components/Filters";
-import DishList from "./Components/DishList";
-import IngredientModal from "./Components/IngredientModel";
-import FooterBar from "./Components/FooterBar";
+import React, { useCallback, useMemo, useState } from 'react';
+import './index.css';
+import './App.css';
+import { DISHES } from './data/mockDishes';
+import Filters from './Components/Filters';
+import DishList from './Components/DishList';
+import IngredientModal from './Components/IngredientModel';
+
+const CATEGORIES = ['STARTER', 'MAIN COURSE', 'DESSERT', 'SIDES'];
 
 function App() {
-  const [selectedCategory, setSelectedCategory] = useState("MAIN COURSE");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [vegFilter, setVegFilter] = useState("");
-  const [selectedDishes, setSelectedDishes] = useState([]);
-  const [currentDish, setCurrentDish] = useState(null);
+  const [activeCategory, setActiveCategory] = useState('STARTER');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [vegOnly, setVegOnly] = useState(false);
+  const [nonVegOnly, setNonVegOnly] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [modalDish, setModalDish] = useState(null);
 
-  // filtering
-  const filteredDishes = dishes.filter((dish) => {
-    const categoryMatch = dish.mealType === selectedCategory;
-    const searchMatch = dish.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const typeMatch = vegFilter ? dish.type === vegFilter : true;
-    return categoryMatch && searchMatch && typeMatch;
-  });
+  const toggleAdd = useCallback((id) => {
+    setSelectedIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+  }, []);
 
-  // toggle add/remove
-  const toggleDish = (id) => {
-    setSelectedDishes((prev) =>
-      prev.includes(id) ? prev.filter((d) => d !== id) : [...prev, id]
-    );
-  };
+  const toggleRemove = useCallback((id) => {
+    setSelectedIds((prev) => prev.filter((x) => x !== id));
+  }, []);
+
+  const onViewIngredients = useCallback((dish) => setModalDish(dish), []);
+  const onCloseModal = useCallback(() => setModalDish(null), []);
+
+  // Filter dishes by category, search, veg/non-veg
+  const filtered = useMemo(() => {
+    const q = searchTerm.trim().toLowerCase();
+    return DISHES.filter((d) => d.mealType === activeCategory)
+      .filter((d) => (q ? d.name.toLowerCase().includes(q) : true))
+      .filter((d) => {
+        if (vegOnly && !nonVegOnly) return d.type === 'VEG';
+        if (!vegOnly && nonVegOnly) return d.type === 'NON-VEG';
+        return true;
+      });
+  }, [activeCategory, searchTerm, vegOnly, nonVegOnly]);
+
+  // Count how many dishes exist in each category
+  const counts = useMemo(() => {
+    const acc = CATEGORIES.reduce((a, c) => ({ ...a, [c]: 0 }), {});
+    DISHES.forEach((d) => {
+      if (acc.hasOwnProperty(d.mealType)) acc[d.mealType] += 1;
+    });
+    return acc;
+  }, []);
 
   return (
-    <div className="p-4 font-sans bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">🍴 Party Menu Selection</h1>
+    <div className="app-container">
+      <h1>TheChefkart — Party Menu Selection</h1>
 
       <Filters
-        activeCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
+        categories={CATEGORIES}
+        activeCategory={activeCategory}
+        onCategoryChange={setActiveCategory}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        vegFilter={vegFilter}
-        setVegFilter={setVegFilter}
+        vegOnly={vegOnly}
+        nonVegOnly={nonVegOnly}
+        onToggleVeg={() => setVegOnly((v) => !v)}
+        onToggleNonVeg={() => setNonVegOnly((n) => !n)}
+        counts={counts}
       />
 
       <DishList
-        dishes={filteredDishes}
-        selectedDishes={selectedDishes}
-        onToggle={toggleDish}
-        onViewIngredients={setCurrentDish}
+        dishes={filtered}
+        selectedIds={selectedIds}
+        onAdd={toggleAdd}
+        onRemove={toggleRemove}
+        onViewIngredients={onViewIngredients}
       />
 
-      {currentDish && (
-        <IngredientModal
-          dish={currentDish}
-          onClose={() => setCurrentDish(null)}
-          onToggle={toggleDish}
-          isSelected={selectedDishes.includes(currentDish.id)}
-        />
-      )}
+      <div className="footer">
+        <div>Total Dish Selected: <strong>{selectedIds.length}</strong></div>
+        <button>Continue</button>
+      </div>
 
-      <FooterBar totalSelected={selectedDishes.length} />
+      <IngredientModal dish={modalDish} onClose={onCloseModal} />
     </div>
   );
 }

@@ -1,62 +1,73 @@
-import React from "react";
+import React from 'react';
 
-function Filters({
+export default function Filters({
+  categories,
   activeCategory,
   onCategoryChange,
   searchTerm,
   onSearchChange,
-  vegFilter,
-  setVegFilter,
+  vegOnly,
+  nonVegOnly,
+  onToggleVeg,
+  onToggleNonVeg,
+  counts
 }) {
-  const categories = ["STARTER", "MAIN COURSE", "DESSERT", "SIDES"];
-
   return (
-    <div className="mb-4">
-      {/* Search */}
-      <input
-        type="text"
-        placeholder="Search dish for your party..."
-        value={searchTerm}
-        onChange={(e) => onSearchChange(e.target.value)}
-        className="w-full p-2 border rounded-lg mb-3"
-      />
+    <div>
+      {/* Search Bar */}
+      <div className="search-bar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Search dish for your party..."
+          value={searchTerm}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
+      </div>
 
-      {/* Tabs */}
-      <div className="flex space-x-2 mb-3">
-        {categories.map((cat) => (
+      {/* Category Tabs */}
+      <div className="tabs">
+        {categories.map((c) => (
           <button
-            key={cat}
-            className={`px-3 py-1 rounded-full text-sm ${
-              activeCategory === cat ? "bg-orange-500 text-white" : "bg-gray-200"
-            }`}
-            onClick={() => onCategoryChange(cat)}
+            key={c}
+            onClick={() => onCategoryChange(c)}
+            className={`tab ${activeCategory === c ? 'active' : ''}`}
           >
-            {cat}
+            {c} ({counts[c] || 0})
           </button>
         ))}
       </div>
 
-      {/* Veg / Non-Veg */}
-      <div className="flex space-x-3">
-        <label className="flex items-center space-x-1">
-          <input
-            type="checkbox"
-            checked={vegFilter === "VEG"}
-            onChange={() => setVegFilter(vegFilter === "VEG" ? "" : "VEG")}
-          />
-          <span>Veg</span>
-        </label>
-        <label className="flex items-center space-x-1">
-          <input
-            type="checkbox"
-            checked={vegFilter === "NON-VEG"}
-            onChange={() => setVegFilter(vegFilter === "NON-VEG" ? "" : "NON-VEG")}
-          />
-          <span>Non-Veg</span>
-        </label>
+      {/* Veg/Non-Veg Filters */}
+      <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
+        <button
+          onClick={onToggleVeg}
+          style={{
+            padding: '8px 14px',
+            borderRadius: 8,
+            border: vegOnly ? '2px solid #10b981' : '1px solid #e5e7eb',
+            background: vegOnly ? '#d1fae5' : '#fff',
+            cursor: 'pointer'
+          }}
+        >
+          Veg
+        </button>
+        <button
+          onClick={onToggleNonVeg}
+          style={{
+            padding: '8px 14px',
+            borderRadius: 8,
+            border: nonVegOnly ? '2px solid #ef4444' : '1px solid #e5e7eb',
+            background: nonVegOnly ? '#fee2e2' : '#fff',
+            cursor: 'pointer'
+          }}
+        >
+          Non-Veg
+        </button>
       </div>
     </div>
   );
 }
-
-export default Filters;

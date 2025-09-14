@@ -1,0 +1,60 @@
+.dish-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  transition: transform 0.2s;
+}
+.dish-card:hover {
+  transform: translateY(-4px);
+}
+
+.dish-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.dish-body {
+  padding: 12px;
+}
+
+.dish-title {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.dish-desc {
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.dish-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ingredient-btn {
+  border: none;
+  background: transparent;
+  color: #f59e0b;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.add-btn, .remove-btn {
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 600;
+}
+.add-btn { background: #10b981; }
+.remove-btn { background: #ef4444; }
